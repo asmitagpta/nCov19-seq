@@ -8,3 +8,6 @@ Dependencies
 2. bwa-mem
 3. samtools-1.10
 4. iVar
+
+The pipeline expects above dependencies to be in the user's working path
+
