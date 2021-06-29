@@ -67,8 +67,12 @@ samtools stat -@16 $outdirname/$sampleName".sort.filt.bam" > $outdirname/$sample
 #samtools sort -o $outdir/$outdirname".primertrimmed.sorted.bam" $outdir/ivar.out.bam
 
 # remove intermediate files
-rm -rf $outdir/$outdirname".sort.bam" 
-#rm $outdir/ivar.out.bam
+rm -rf $outdirname/$sampleName".sort.bam"
+
+# make consensus sequence
+samtools mpileup -aa -A -B -d ${mpileupDepth} -Q0 $outdirname/$sampleName".sort.filt.bam" |  \
+ivar consensus -t ${ivarFreqThreshold} -m ${ivarMinDepth} -n N -p $outdirname/$sampleName".consensus"
+
 
 # variant calling using iVar
 echo -e "ivar variant calling from samtools mpileup..\n\n"
@@ -79,9 +83,9 @@ ${ivarMinVariantQuality} -t ${ivarMinFreqThreshold}"`
 eval $VAR_CALL
 
 #convert ivar .tsv to .vcf 
-
 echo -e "convert .tsv to .vcf (iVar)\n\n"
 TSVTOVCF=`echo -e python3 ivar_variants_to_vcf.py $outdirname/$sampleName".variants.tsv" $outdirname/$sampleName".variants.vcf"` 
+
 eval $TSVTOVCF
 
 #annotate VCF file using snpEff
