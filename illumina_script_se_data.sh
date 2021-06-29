@@ -3,7 +3,7 @@
 start="date +%D"
 usage()
 {
-  echo "Usage: ./test_tmp.sh -d <Directory of fastq files> -h <help>"
+  echo "Usage: ./illumina_script_se_data.sh -d <Directory of fastq files> -h <help>"
   exit 2
 }
 
