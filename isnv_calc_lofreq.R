@@ -15,30 +15,8 @@ all.data.seq$DATE.OF.SAMPLE.COLLECTION <- parse_date_time(all.data.seq$DATE.OF.S
                                         orders = c('m/d/y','Y-m-d','m/d/Y','d.m.Y','d-m-Y','d.m.y','m.d.y','m.d.Y'))
 all.data.seq$DATE.OF.SAMPLE.COLLECTION <- as.Date(all.data.seq$DATE.OF.SAMPLE.COLLECTION)
 
-lofreq.1 <- read.csv('isnv-lofreq/all_mutations_from_lofreq.csv', sep = '\t', stringsAsFactors = FALSE)
-lofreq.1 <- lofreq.1[,1:9]
-lofreq.2 <- read.csv('isnv-lofreq/all_mutations_from_lofreq_set_new.csv', sep = '\t', stringsAsFactors = FALSE)
-lofreq.3 <- read.csv('isnv-lofreq/all_mutations_from_lofreq_data3jul.csv', sep = '\t', stringsAsFactors = FALSE)
-lofreq.4 <- read.csv('isnv-lofreq/all_mutations_from_lofreq_data20jul.csv', sep = '\t', stringsAsFactors = FALSE)
-lofreq.5 <- read.csv('isnv-lofreq/all_mutations_from_lofreq_data28jul.csv', sep='\t', stringsAsFactors = FALSE)
-lofreq.6 <- read.csv('isnv-lofreq/all_mutations_from_lofreq_data2aug.csv', sep = '\t', stringsAsFactors = FALSE)
-lofreq.7 <- read.csv('isnv-lofreq/all_mutations_from_lofreq_5aug.csv', sep = '\t', stringsAsFactors = FALSE)
-lofreq.8 <- read.csv('isnv-lofreq/all_mutations_from_lofreq_16aug.csv', sep = '\t', stringsAsFactors = F)
-lofreq.9 <- read.csv('all_mutations_from_lofreq_16aug1_16.csv', sep = '\t', stringsAsFactors = F)
-lofreq.10 <- read.csv('all_mutations_from_iVar_from_aug_sep.csv', sep = '\t', stringsAsFactors = F)
-lofreq.10 <- lofreq.10[, c(seq(1:8),11)]
-
-lo.all <- rbind(lofreq.1, lofreq.2, lofreq.3, lofreq.4, lofreq.5, lofreq.6, lofreq.7, lofreq.8, lofreq.9, lofreq.10)
-lo.all.sub1 <- lo.all[grep('lofreq_snpeff.vcf',lo.all$sample_id),]
-lo.all.sub1[,c('dep','effect','mod','gene','gp','gene_type','gp01','cols8','cols9','codon', 'aa','cols12')] <- str_split_fixed(lo.all.sub1$INFO,'[|]',12)
-
-lo.all.sub2 <- anti_join(lo.all, lo.all.sub1)
-lo.all.sub2[,c('dep','effect','codon','aa', 'mod', 'gene','gene_type','gp01','cols8','cols9','cols10','cols12')] <- str_split_fixed(lo.all.sub2$INFO,'[|]',12)
-
-lo.all.sub1 <- lo.all.sub1 %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','sample_id','dep','aa','gene','effect')
-lo.all.sub2 <- lo.all.sub2 %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','sample_id','dep','aa','gene','effect')
-lo.all <- rbind(lo.all.sub1,lo.all.sub2)
-
+# read lofreq mutation file from here
+lo.all <- read.csv('lofreq_mutations.csv', sep = '\t', stringsAsFactors = FALSE)
 
 lo.all$sample_id <- str_replace(lo.all$sample_id, '.lofreq_snpeff.vcf','')
 lo.all$sample_id <- str_replace(lo.all$sample_id, '.lofreq_ann.vcf','')
@@ -305,26 +283,7 @@ ggsave(ntd.changes, filename = "paper-II/figures/isnv_ntd_changes.png", width = 
 ggsave(ntd.changes, filename = "paper-II/figures/isnv_ntd_changes.eps", device = cairo_ps, width = 8, height = 8, dpi = 300)
 
 # sample feature analysis showing iSNV
-pango <- read.csv('pangolin_analysis_all_till_date.csv')
-pango.16aug <- read.csv('pangolin_16aug_2021.csv')
-pango.27aug <- read.csv('pangolin_27aug_2021.csv')
-pango.27sep <- read.csv('pangolin_27sep.csv')
-pango.30sep <- read.csv('pangolin_sep15.csv')
-pango <- rbind(pango, pango.16aug, pango.27aug, pango.27sep, pango.30sep)
-
-
-pango$sampID <- pango$Sequence.name
-ont.ind <- grep('ONT_',pango$sampID)
-ont.df <- pango[ont.ind,]
-pango.sub <- anti_join(pango, ont.df)
-
-pango.sub$sampID <- str_replace(pango.sub$sampID,'Consensus_','')
-ont.df$sampID <- str_replace(ont.df$sampID,'ONT_','')
-pango.sub[,c('base','rest')] <- str_split_fixed(pango.sub$sampID,'_S[0-9]+',2)
-pango.sub$base <- str_replace(pango.sub$base,'XI','Xi')
-pango.sub$base <- str_replace(pango.sub$base,'48001','ncov-48001')
-ont.df[,c('base','rest')] <- str_split_fixed(ont.df$sampID,'_',2)
-pango.all <- rbind(pango.sub, ont.df)
+pango.all <- read.csv('pangolin_all_data.csv')
 
 isnv.samp <- isnv.samp.freq.filtered %>% select(base) 
 isnv.samp.lin <- pango.all %>% filter(base %in% isnv.samp.freq$base)
