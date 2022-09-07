@@ -26,69 +26,19 @@ all.data.seq2$DATE.OF.SAMPLE.COLLECTION <- parse_date_time(all.data.seq2$DATE.OF
                                                            orders = c('m/d/y','Y-m-d','m/d/Y','d.m.Y','d-m-Y','d.m.y'))
 all.data.seq2$DATE.OF.SAMPLE.COLLECTION <- as.Date(all.data.seq2$DATE.OF.SAMPLE.COLLECTION)
 
-ivarjun20 <- read.csv('all_mutations_from_ivar_set210_april_jun2020.csv', sep = '\t', stringsAsFactors = FALSE)
-ivardec20 <- read.csv('all_mutations_from_iVar_set40_aug_dec2020.csv', sep = '\t', stringsAsFactors = FALSE)
-ivarjul21 <- read.csv('all_mutations_from_iVar_from_jan2021.csv', sep = '\t', stringsAsFactors = FALSE)
-ivaraug21 <- read.csv('all_mutations_from_iVar_from_aug2021.csv', sep = '\t', stringsAsFactors = F)
-ivaraug1_16 <- read.csv('all_mutations_from_iVar_from_aug1_16_2021.csv', sep = '\t', stringsAsFactors = F)
-ivar_sep <- read.csv('all_mutations_from_iVar_from_aug_sep.csv', sep = '\t', stringsAsFactors = F)
-ivar_sep2 <- read.csv('all_mutations_from_iVar_sep16_30.csv', sep = '\t', stringsAsFactors = F)
-ivar_oct <- read.csv('all_mutations_from_iVar_oct1_15.csv', sep = '\t', stringsAsFactors = F)
-ivar_oct2 <- read.csv('all_mutations_from_iVar_oct15_30.csv', sep = '\t', stringsAsFactors = F)
 
-#selecting dataframes by common columns
-ivarjun20.sub <- ivarjun20 %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id') 
-ivardec20.sub <- ivardec20 %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id')
-ivarjul21.sub <- ivarjul21 %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id')                
-ivaraug21.sub <- ivaraug21 %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id')                
-ivaraug1_16.sub <- ivaraug1_16 %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id')                
-ivarsep.sub <- ivar_sep %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id')                
-ivarsep2.sub <- ivar_sep2 %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id')                
-ivaroct.sub <- ivar_oct %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id')                
-ivaroct2.sub <- ivar_oct2 %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id')
+ivar.all <- read.csv('ivar_mutations.csv', sep = '\t', stringsAsFactors = F)
 
-ivardecjuly21 <- rbind(ivardec20.sub, ivarjul21.sub, ivaraug21.sub, ivaraug1_16.sub, ivarsep.sub, ivarsep2.sub, ivaroct.sub, ivaroct2.sub)
-ivardecjuly21[,c('dep','type','codon','aa','cols5','gene','gene_type','coding','gp01','cols10','cols11','cols12')] <- str_split_fixed(ivardecjuly21$INFO,'[|]',12)
-
-#Replacind odd portions from sample IDs
-ivardecjuly21$sample_id <- str_replace(ivardecjuly21$sample_id,'../Data_12Jun/igib_upload/','')
-ivardecjuly21$sample_id <- str_replace(ivardecjuly21$sample_id,'../Data_20Jul/','')
-ivardecjuly21$sample_id <- str_replace(ivardecjuly21$sample_id,'../Data_28Jul/','')
-ivardecjuly21$sample_id <- str_replace(ivardecjuly21$sample_id,'../Data_02Aug/','')
-ivardecjuly21$sample_id <- str_replace(ivardecjuly21$sample_id,'../Data_03Jul/','')
-ivardecjuly21$sample_id <- str_replace(ivardecjuly21$sample_id,'../Data_05Aug/','')
-ivardecjuly21$sample_id <- str_replace(ivardecjuly21$sample_id,'../Data_30Sep/','')
-
-
-ivardecjuly21[,c('samp_id_base','samp_id_rest')] <- str_split_fixed(ivardecjuly21$sample_id,'/',2)
-ivardecjuly21[,c('base','rest')] <- str_split_fixed(ivardecjuly21$samp_id_base,'_S[0-9]+',2)
-
-ivarjun20.sub[,c('dep','type','effect','gene','gp01','gene_type','gp02','coding','cols9','nt','aa','cols12')] <- str_split_fixed(ivarjun20$INFO,'[|]',12)
-
-#fix nanopore sample names issues
-ont.ind <- grep('artic',ivarjun20.sub$sample_id)
-ont.df <- ivarjun20.sub[ont.ind,]
-ivarjun20.tmp <- anti_join(ivarjun20.sub, ont.df)
-ont.df[,c('base','rest')] <- str_split_fixed(ont.df$sample_id,'_',2)
-ivarjun20.tmp[,c('base','rest')] <- str_split_fixed(ivarjun20.tmp$sample_id,'_S[0-9]+',2)
-ivarjun20.sub <- rbind(ivarjun20.tmp, ont.df)
-
-ivardecjuly21 <- ivardecjuly21 %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id','dep','aa','gene','base','type')
-ivarjun20.sub <- ivarjun20.sub %>% select('POS','ID','REF','ALT','QUAL','FILTER','INFO','FORMAT','sample_id','dep','aa','gene','base','type')
-ivar.all <- rbind(ivarjun20.sub,ivardecjuly21)
-
-#merge the two ont and illumina dataframes again
-ivar.all$base <- str_replace(ivar.all$base,'XI','Xi')
-ivar.all$base <- str_replace(ivar.all$base,'Xi758','XI758') # temporary change
-
+# create sample names column
 samplenames <- as.data.frame(ivar.all$base)
 
+# basic formatting 
 ivar.all$aa <- str_replace(ivar.all$aa,'p.','')
 ivar.all$aa <- str_replace_all(ivar.all$aa,c('Asp'='D', 'Arg'='R','Gly'='G','Pro'='P','Leu'='L','Lys'='K','Val'='V',
                                                'Ser'='S','Cys'='C','Ala'='A','Phe'='F','Glu'='E','Thr'='T','Tyr'='Y',
                                                'Ile'='I','His'='H','Asn'='N','Gln'='Q','Met'='M','Trp'='W'))
 
-#mutation frequencies globally
+# analyze mutation frequencies globally
 data.plot <- ivar.all %>% 
   mutate(tot_samp=n_distinct(base)) %>% 
   group_by(POS, REF, ALT) %>% 
@@ -96,7 +46,7 @@ data.plot <- ivar.all %>%
   mutate(freq=total_num/tot_samp) %>% 
   arrange(POS)
 
-
+# generate a consolidated binary cross correlation matrix indicating if a mutation exists in the sample or not 
 df.split <- data.plot %>% 
   filter(!type %in% c('synonymous_variant','SILENT')) %>% 
   filter(freq >= 0.03) %>% 
@@ -229,7 +179,7 @@ head(p.mat[, 1:5])
 
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 setEPS()
-postscript(file='paper-II/figures/mutation_correlation_matrix_non_silent_all_samples_till_date.eps', width = 17, height = 16)
+postscript(file='mutation_correlation_matrix_non_silent_all_samples_till_date.eps', width = 17, height = 16)
 corrplot(cor(all.data.seq.copy[,c(-1,-2)]), method="square", mar = c(0.5,7,1.5,1),
          col=brewer.pal(8,'RdYlBu'),  
          type="lower", order="hclust", 
