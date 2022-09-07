@@ -91,15 +91,8 @@ cols <- colnames(samp.data)
 c = cols[grep("*_$",cols, invert = T)]
 samp.data <- samp.data[,c]
 
-#get pangolin info on samples with delta lineage
-pango <- read.csv('pangolin_analysis_all_till_date.csv')
-#pango.16aug <- read.csv('pangolin_16aug_2021.csv')
-#pango.27aug <- read.csv('pangolin_27aug_2021.csv')
-#pango.27sep <- read.csv('pangolin_27sep.csv')
-#pango.30sep <- read.csv('pangolin_sep15.csv')
-pango_aug_sep <- read.csv('pangolin_aug_sep.csv')
-pango.30oct <- read.csv('lineage_results_till_30Oct.csv')
-pango <- rbind(pango,pango_aug_sep, pango.30oct)
+#get pangolin info on samples with delta and other specific lineage
+pango <- read.csv('pangolin_all_data.csv')
 
 pango$sampID <- pango$Sequence.name
 ont.ind <- grep('ONT_',pango$sampID)
