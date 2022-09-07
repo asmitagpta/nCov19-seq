@@ -1,6 +1,6 @@
 # nCov19-seq
 
-Pipeline to analyze Illumina COVIDSeq data generated using NextSeq2000 platform
+Custom scripts and pipelines used to analyze Illumina COVIDSeq data generated using NextSeq2000 platform
 
 Dependencies
 
@@ -19,5 +19,6 @@ The pipeline expects above dependencies to be in the user's working path. The pi
 
 https://github.com/jts/ncov-tools/blob/master/workflow/scripts/ivar_variants_to_vcf.py
 
+1. mutation_cross_correlation_analysis - script used to analyze mutation cross-correlation as presented in figure 3
 
 
