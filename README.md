@@ -18,7 +18,3 @@ Dependencies
 The pipeline expects above dependencies to be in the user's working path. The pipeline also utilizes an external python script to convert the .tsv files generated from iVar to VCF format. The external pythn scripts has been taken from another github repository-
 
 https://github.com/jts/ncov-tools/blob/master/workflow/scripts/ivar_variants_to_vcf.py
-
-1. mutation_cross_correlation_analysis - script used to analyze mutation cross-correlation as presented in figure 3
-
-
