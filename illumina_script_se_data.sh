@@ -62,9 +62,9 @@ samtools index $outdirname/$sampleName".sort.filt.bam"
 samtools stat -@16 $outdirname/$sampleName".sort.filt.bam" > $outdirname/$sampleName".stat"
 	 
 # mask primers using ivar
-#echo "ivar primer masking.."
-#ivar trim -e -i $outdir/$outdirname".sort.filt.bam" -b ${bedfile} -m ${illuminaKeepLen} -q ${illuminaQualThreshold} -p $outdir/ivar.out
-#samtools sort -o $outdir/$outdirname".primertrimmed.sorted.bam" $outdir/ivar.out.bam
+echo "ivar primer masking.."
+ivar trim -e -i $outdir/$outdirname".sort.filt.bam" -b ${bedfile} -m ${illuminaKeepLen} -q ${illuminaQualThreshold} -p $outdir/ivar.out
+samtools sort -o $outdir/$outdirname".primertrimmed.sorted.bam" $outdir/ivar.out.bam
 
 # remove intermediate files
 rm -rf $outdirname/$sampleName".sort.bam"
